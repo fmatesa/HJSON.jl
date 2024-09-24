@@ -3,6 +3,10 @@ uuid = "6226b997-59fe-41cb-ba3d-177c22dd73bb"
 authors = ["Fabian Mateša"]
 version = "1.0.0-DEV"
 
+[deps]
+Hjson_jll = "c7ce213b-85ae-5bf1-9497-6be93055ed87"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+
 [compat]
 julia = "1.6.7"
 
