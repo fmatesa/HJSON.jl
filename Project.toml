@@ -1,4 +1,4 @@
-name = "hjson"
+name = "HJSONTool"
 uuid = "6226b997-59fe-41cb-ba3d-177c22dd73bb"
 authors = ["Fabian Mateša"]
 version = "1.0.0"
@@ -9,6 +9,8 @@ JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 
 [compat]
 julia = "1.6.7"
+JSON = "0.21.4"
+Hjson_jll = "4.4.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
