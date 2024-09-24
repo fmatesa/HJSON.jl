@@ -1,4 +1,4 @@
-module HJSONTool
+module HJSON
 
 using Hjson_jll
 using JSON

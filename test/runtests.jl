@@ -1,6 +1,6 @@
-using HJSONTool
+using HJSON
 using Test
 
-@testset "HJSONTool.jl" begin
+@testset "HJSON.jl" begin
     # Write your tests here.
 end
