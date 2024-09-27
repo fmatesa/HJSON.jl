@@ -28,11 +28,12 @@ end
 
 
 """
-    read_hjson(fpath_input)
+    read_hjson(fpath_input, keys_as_symbols=false)
 
 Read a .hjson file and return the result as a Dictionary.
+Dictionary strings will be symbols instead of keys if `keys_as_symbols` is set to true.
 """
-read_hjson(fpath_input) = to_json(fpath_input, nothing; formatted=false)
+read_hjson(fpath_input, keys_as_symbols=false) = to_json(fpath_input, nothing; formatted=false, keys_as_symbols)
 
 """
     to_json(fpath_input, fpath_output; kwargs...)
@@ -50,16 +51,22 @@ instead of saving it.
 """
 function to_json(
     fpath_input, fpath_output; 
-    formatted=true, indent_by=nothing, preserve_key_order=false
+    formatted=true, indent_by=nothing, preserve_key_order=false, keys_as_symbols=false
 )
     args = _hjson_args(; output_type="JSON", formatted, indent_by, preserve_key_order)
 
     json = Pipe()
     run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=json); wait=false)
 
-    isnothing(fpath_output) && return JSON.parse(json)
+    isnothing(fpath_output) && !keys_as_symbols && return JSON.parse(json)
 
     close(json.in)
+
+    if isnothing(fpath_output) && keys_as_symbols
+        json_string = read(json, String)
+        return copy(JSON3.read(json_string))
+    end
+
     open(fpath_output, "w") do f
         write(f, json.out)
     end
