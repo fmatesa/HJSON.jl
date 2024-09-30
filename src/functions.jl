@@ -12,6 +12,7 @@ Translate a .json file or dictionary to .hjson.
 - `omit_root_braces`: defaults to false
 - `preserve_key_order`: defaults to false
 - `quote_always`: Always writes quotation marks around string arguments. Defaults to false.
+- `async`: If this value is true, the CLI call will be asynchronous
 """
 function to_hjson(
     fpath_input, fpath_output; 
@@ -19,20 +20,20 @@ function to_hjson(
     indent_by=nothing, 
     omit_root_braces=false, 
     preserve_key_order=false, 
-    quote_always=false
+    quote_always=false,
+    async=false
 )
     args = _hjson_args(; braces_same_line, indent_by, omit_root_braces, preserve_key_order, quote_always)
     
-    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=fpath_output); wait=false)
+    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=fpath_output); wait=!async)
     return nothing
 end
 
 function to_hjson(input::AbstractDict, fpath_output; kwargs...)
-    args = _hjson_args(; kwargs...)
-
     mktemp() do path, io
         JSON3.pretty(io, input)
-        run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=path, stdout=fpath_output); wait=false)
+        close(io)
+        to_hjson(path, fpath_output; kwargs...)
     end
 
     return nothing
@@ -67,15 +68,16 @@ instead of saving it.
 - `indent_by`: a custom string to be used instead of default whitespace for indentation.
     Defaults to nothing
 - `preserve_key_order`: defaults to false
+- `async`: If this value is true, the CLI call will be asynchronous
 """
 function to_json(
     fpath_input, fpath_output; 
-    formatted=true, indent_by=nothing, preserve_key_order=false, keys_as_symbols=false
+    formatted=true, indent_by=nothing, preserve_key_order=false, keys_as_symbols=false, async=false
 )
     args = _hjson_args(; output_type="JSON", formatted, indent_by, preserve_key_order)
 
     json = Pipe()
-    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=json); wait=true)
+    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=json); wait=!async)
 
     isnothing(fpath_output) && !keys_as_symbols && return JSON.parse(json)
 
