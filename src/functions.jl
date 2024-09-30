@@ -1,7 +1,8 @@
 """
     to_hjson(fpath_input, fpath_output; kwargs...)
+    to_hjson(input::AbstractDict, fpath_output; kwargs...)
 
-Translate a .json file to .hjson.
+Translate a .json file or dictionary to .hjson.
 
 # Keywords
 
@@ -38,12 +39,20 @@ function to_hjson(input::AbstractDict, fpath_output; kwargs...)
 end
 
 """
-    read_hjson(fpath_input, keys_as_symbols=false)
+    read_hjson(input::String, keys_as_symbols=false)
 
-Read a .hjson file and return the result as a Dictionary.
+Read a .hjson file from a given filepath or string and return the result as a Dictionary.
 Dictionary strings will be symbols instead of keys if `keys_as_symbols` is set to true.
 """
-read_hjson(fpath_input, keys_as_symbols=false) = to_json(fpath_input, nothing; formatted=false, keys_as_symbols)
+function read_hjson(input::String, keys_as_symbols=false)
+    !startswith(input, "{") && return to_json(input, nothing; formatted=false, keys_as_symbols)
+    input = replace(input, "}" => "\n}", "{" => "\n{")
+    mktemp() do path, io
+        write(io, input)
+        close(io)
+        return read_hjson(path, keys_as_symbols)
+    end
+end
 
 """
     to_json(fpath_input, fpath_output; kwargs...)
@@ -66,7 +75,7 @@ function to_json(
     args = _hjson_args(; output_type="JSON", formatted, indent_by, preserve_key_order)
 
     json = Pipe()
-    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=json); wait=false)
+    run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=json); wait=true)
 
     isnothing(fpath_output) && !keys_as_symbols && return JSON.parse(json)
 

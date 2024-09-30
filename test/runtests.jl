@@ -10,6 +10,9 @@ using Test
 
         dict = HJSON.read_hjson("test.hjson", true)
         @test dict[:test] === "test"
+
+        dict = HJSON.read_hjson("{test: test}")
+        @test dict["test"] === "test"
     end
 
     @testset "to_json" begin
