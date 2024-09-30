@@ -26,6 +26,16 @@ function to_hjson(
     return nothing
 end
 
+function to_hjson(input::AbstractDict, fpath_output; kwargs...)
+    args = _hjson_args(; kwargs...)
+
+    mktemp() do path, io
+        JSON3.pretty(io, input)
+        run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=path, stdout=fpath_output); wait=false)
+    end
+
+    return nothing
+end
 
 """
     read_hjson(fpath_input, keys_as_symbols=false)

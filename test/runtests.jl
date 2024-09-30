@@ -23,7 +23,18 @@ using Test
     end
 
     @testset "to_hjson" begin
-        HJSON.to_json("test.json", "result.hjson")
+        HJSON.to_hjson("test.json", "result.hjson")
+        @test isfile("result.hjson")
+
+        dict = HJSON.read_hjson("result.hjson")
+        @test dict["test"] === "test"
+
+        rm("result.hjson")
+    end
+
+    @testset "to_hjson dictionary" begin
+        testdict = Dict(:test => "test")
+        HJSON.to_hjson(testdict, "result.hjson")
         @test isfile("result.hjson")
 
         dict = HJSON.read_hjson("result.hjson")
