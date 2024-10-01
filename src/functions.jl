@@ -46,7 +46,7 @@ Read a .hjson file from a given filepath or string and return the result as a Di
 Dictionary strings will be symbols instead of keys if `keys_as_symbols` is set to true.
 """
 function read_hjson(input::String, keys_as_symbols=false)
-    !startswith(input, "{") && return to_json(input, nothing; formatted=false, keys_as_symbols)
+    !(startswith(input, "{") || startswith(input, "[")) && return to_json(input, nothing; formatted=false, keys_as_symbols)
     input = replace(input, "}" => "\n}", "{" => "\n{")
     mktemp() do path, io
         write(io, input)
