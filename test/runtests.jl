@@ -13,6 +13,10 @@ using Test
 
         dict = HJSON.read_hjson("{test: test}")
         @test dict["test"] === "test"
+
+        dict = HJSON.read_hjson("large.hjson", true)
+        @test 1==1
+
     end
 
     @testset "to_json" begin
@@ -23,6 +27,11 @@ using Test
         @test dict["test"] === "test"
 
         rm("result.json")
+
+        HJSON.to_json("large.hjson", "result.json")
+        @test isfile("result.json")
+
+        rm("result.json")
     end
 
     @testset "to_hjson" begin
@@ -31,6 +40,11 @@ using Test
 
         dict = HJSON.read_hjson("result.hjson")
         @test dict["test"] === "test"
+
+        rm("result.hjson")
+
+        HJSON.to_hjson("large.json", "result.hjson")
+        @test isfile("result.hjson")
 
         rm("result.hjson")
     end
