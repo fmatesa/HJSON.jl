@@ -46,7 +46,7 @@ Read a .hjson file from a given filepath or string and return the result as a Di
 Dictionary strings will be symbols instead of keys if `keys_as_symbols` is set to true.
 """
 function read_hjson(input::String, keys_as_symbols=false)
-    !(startswith(input, "{") || startswith(input, "[")) && return to_json(input, nothing; formatted=false, keys_as_symbols)
+    !(startswith(input, "{") || startswith(input, "[")) && return to_json(input, nothing; formatted=false, keys_as_symbols, preserve_key_order=true)
     input = replace(input, "}" => "\n}", "{" => "\n{")
     mktemp() do path, io
         write(io, input)
@@ -78,7 +78,7 @@ function to_json(
 
     if isnothing(fpath_output)
         json_string = read(`$(Hjson_jll.hjson()) $args $fpath_input`, String)
-        return keys_as_symbols ? copy(JSON3.read(json_string)) : JSON.parse(json_string)
+        return keys_as_symbols ? JSON3.read(json_string) |> OrderedDict : JSON.parse(json_string; dicttype=OrderedDict)
     end
 
     run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=fpath_output); wait=!async)

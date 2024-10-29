@@ -1,18 +1,19 @@
 name = "HJSON"
 uuid = "6226b997-59fe-41cb-ba3d-177c22dd73bb"
 authors = ["Fabian Mateša"]
-version = "1.4.2"
+version = "1.5.2"
 
 [deps]
 Hjson_jll = "c7ce213b-85ae-5bf1-9497-6be93055ed87"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 
 [compat]
 Hjson_jll = "4.4.0"
 JSON = "0.21.4"
-julia = "1.6.7"
 JSON3 = "1.14.0"
+julia = "1.6.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
