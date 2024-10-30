@@ -88,6 +88,8 @@ end
 function cleanup_json3(obj::OrderedDict{K, V}) where {K, V}
     for (k, v) in obj
         obj[k] = v isa JSON3.Object || v isa JSON3.Array ? copy(v) : v
+        !(obj[k] isa Dict) && continue 
+        obj[k] = obj[k] |> OrderedDict 
     end
     return obj
 end
