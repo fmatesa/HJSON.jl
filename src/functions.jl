@@ -78,19 +78,23 @@ function to_json(
 
     if isnothing(fpath_output)
         json_string = read(`$(Hjson_jll.hjson()) $args $fpath_input`, String)
-        return keys_as_symbols ? cleanup_json3(JSON3.read(json_string) |> OrderedDict) : JSON.parse(json_string; dicttype=OrderedDict)
+        return keys_as_symbols ? cleanup_json3(JSON3.read(json_string)) : JSON.parse(json_string; dicttype=OrderedDict)
     end
 
     run(pipeline(`$(Hjson_jll.hjson()) $args`; stdin=fpath_input, stdout=fpath_output); wait=!async)
     return nothing
 end
 
-function cleanup_json3(obj::OrderedDict{K, V}) where {K, V}
-    for (k, v) in obj
-        if v isa JSON3.Object 
-            obj[k] = cleanup_json3(v |> OrderedDict)
-        elseif v isa JSON3.Array
-            obj[k] = copy(v)
+function cleanup_json3(obj)
+    if obj isa JSON3.Object 
+        obj = obj |> OrderedDict
+        for (k, v) in obj
+            obj[k] = cleanup_json3(v)
+        end
+    elseif obj isa JSON3.Array
+        obj = copy(obj)
+        for (i, v) in enumerate(obj)
+            obj[i] = cleanup_json3(v)
         end
     end
     return obj
